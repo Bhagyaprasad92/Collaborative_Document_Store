@@ -1,0 +1,44 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: collaborative_mongo
+    restart: always
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongo_data:/data/db
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  api:
+    build: .
+    container_name: collaborative_api
+    restart: always
+
+    ports:
+      - "5001:5000"
+
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+    env_file:
+      - .env
+
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - DATABASE_NAME=collaborative_docs
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  mongo_data:
