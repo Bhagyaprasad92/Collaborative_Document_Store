@@ -138,3 +138,31 @@ To convert all legacy string-based author schemas (`"metadata.author": "Jane Doe
 docker exec -it collaborative_api npm run migrate
 ```
 This runs the standalone migration script located at `scripts/migrate_author_schema.js`.
+
+## Security
+
+A production environment requires strict boundaries to prevent abuse and ensure data integrity.
+
+- **Rate Limiting:** Global rate limiting is applied to all `/api` routes (e.g., 100 requests per 15 minutes per IP) to mitigate DDoS attacks and API abuse.
+- **Data Sanitization:** All incoming Markdown payload content is heavily sanitized on the server side to prevent Cross-Site Scripting (XSS) and NoSQL injection attacks before being persisted to MongoDB.
+
+---
+
+## Deployment & CI/CD
+
+This service is built to be stateless and horizontally scalable across multiple containers or pods.
+
+### Continuous Integration
+Automated workflows (e.g., GitHub Actions) are configured to run on every Pull Request to the `main` branch:
+1. Code Linting (`npm run lint`)
+2. Unit & Integration Test Suite (`npm test`)
+3. Docker Image Build Verification
+
+### Production Environment
+When deploying to a live environment (e.g., AWS ECS, Kubernetes, or DigitalOcean Apps), ensure the following environment variables are securely injected via your hosting provider's secret manager. **Never commit production secrets to version control.**
+
+```env
+# Required Production Variables
+NODE_ENV=production
+MONGO_URI=mongodb+srv://<user>:<secret>@cluster.mongodb.net/prod_db?retryWrites=true&w=majority
+PORT=8080
