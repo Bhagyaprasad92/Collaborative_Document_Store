@@ -166,3 +166,11 @@ When deploying to a live environment (e.g., AWS ECS, Kubernetes, or DigitalOcean
 NODE_ENV=production
 MONGO_URI=mongodb+srv://<user>:<secret>@cluster.mongodb.net/prod_db?retryWrites=true&w=majority
 PORT=8080
+
+## Testing
+
+This project uses **Jest** and **Supertest** for unit and integration testing. Tests are run against a dedicated in-memory MongoDB instance (`mongodb-memory-server`) to ensure isolation from your local database.
+
+Run the test suite:
+```bash
+npm test
